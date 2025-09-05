@@ -1,5 +1,12 @@
 #!/bin/bash
-# See skript väljastab kasutajale isikupärase tervituse.
+# See skript väljastab kasutajale tervituse, kasutades tema kasutajanime.
+
+# 1. Väljasta "Tere, " ilma reavahetuseta
 echo -n "Tere, "
+
+# 2. Tekita kasutaja nimi vastava käsu(de) abil ja väljasta ilma reavahetuseta
+# "$USER" muutuja sisaldab jooksva kasutaja nime.
 echo -n "$USER"
+
+# 3. Väljasta "!" reavahetusega
 echo "!"
