@@ -1,0 +1,10 @@
+#!/bin/bash
+# See skript kuvab praeguse kuupäeva, kellaaja ja käesoleva kuu kalendri.
+
+echo "Tänane kuupäev ja kellaaeg:"
+date
+
+echo "" # Tühi rida loetavuse parandamiseks
+
+echo "Käesoleva kuu kalender:"
+cal
