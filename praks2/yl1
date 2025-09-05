@@ -1,0 +1,5 @@
+#!/bin/bash
+# See skript väljastab kasutajale isikupärase tervituse.
+echo -n "Tere, "
+echo -n "$USER"
+echo "!"
