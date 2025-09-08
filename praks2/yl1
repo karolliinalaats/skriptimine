@@ -1,14 +1,14 @@
 #!/bin/bash
-# Skript kuvab kasutajale tervitust "Tere, Kasutajanimi !", kus kasutajanimi on esitähega suure tähega ja ülejäänud väikeste tähtedega
+# Skript tervitab jooksva kasutajat tema kasutajanimega, kus nimi algab suurtähega
 
-# Kasutajanimi väikestena
-nimi_lower=$(echo "$USER" | tr '[:upper:]' '[:lower:]')
+# Võtame kasutajanime keskkonnamuutujast $USER
+username=$USER
 
-# Esimene täht suureks, ülejäänud väikesteks
-nimi="$(echo ${nimi_lower:0:1} | tr '[:lower:]' '[:upper:]')${nimi_lower:1}"
+# Teeme esimese tähe suureks ja ülejäänud väikseks
+username="$(tr '[:lower:]' '[:upper:]' <<< ${username:0:1})${username:1}"
 
-# Väljasta tervitus
 echo -n "Tere, "
-echo -n "$nimi"
-echo " !"
+echo -n "$username"
+echo "!"
+
 
