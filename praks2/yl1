@@ -1,12 +1,14 @@
 #!/bin/bash
-# See skript väljastab kasutajale tervituse, kasutades tema kasutajanime.
+# Skript kuvab kasutajale tervitust "Tere, Kasutajanimi !", kus kasutajanimi on esitähega suure tähega ja ülejäänud väikeste tähtedega
 
-# 1. Väljasta "Tere, " ilma reavahetuseta
+# Kasutajanimi väikestena
+nimi_lower=$(echo "$USER" | tr '[:upper:]' '[:lower:]')
+
+# Esimene täht suureks, ülejäänud väikesteks
+nimi="$(echo ${nimi_lower:0:1} | tr '[:lower:]' '[:upper:]')${nimi_lower:1}"
+
+# Väljasta tervitus
 echo -n "Tere, "
+echo -n "$nimi"
+echo " !"
 
-# 2. Tekita kasutaja nimi vastava käsu(de) abil ja väljasta ilma reavahetuseta
-# "$USER" muutuja sisaldab jooksva kasutaja nime.
-echo -n "$USER"
-
-# 3. Väljasta "!" reavahetusega
-echo "!"
