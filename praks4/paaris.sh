@@ -1,14 +1,18 @@
 #!/bin/bash
-# Skript, mis kontrollib, kas kasutaja sisestatud täisarv on paaris või paaritu.
+# Skript kontrollib, kas sisestatud arv on paaris või paaritu.
 
-# Küsime kasutajalt täisarvu.
-echo "Sisesta suvaline täisarv:"
-read arv
+# Küsi kasutajalt täisarv
+echo -n "Sisesta suvaline täisarv: "
+read number
 
-# Kontrollime mooduloperaatoriga (%).
-# Kui arv jagatuna kahega (2) annab jäägi 0, on see paaris.
-# Vastasel juhul on see paaritu.
-if (( arv % 2 == 0 )); then
+# Kontrolli, kas sisestus on täisarv
+if ! [[ "$number" =~ ^[0-9]+$ ]]; then
+  echo "Viga: Sisestatud väärtus ei ole täisarv."
+  exit 1
+fi
+
+# Kontrolli, kas arv on paaris või paaritu
+if (( number % 2 == 0 )); then
   echo "Antud arv on paaris"
 else
   echo "Antud arv on paaritu"
