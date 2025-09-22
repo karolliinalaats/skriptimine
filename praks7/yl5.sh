@@ -1,5 +1,5 @@
 #!/bin/bash
-# Skript prindib tühikute asemel ringe ja tärne, luues kolmnurkse mustri.
+# Skript, mis prindib tühikute asemel ringe ja tärne, luues kolmnurkse mustri.
 # Skript valideerib kasutaja sisestuse, veendumaks, et tegemist on numbriga.
 
 # Funktsioon sisendi valideerimiseks
@@ -21,21 +21,27 @@ done
 # Välimine tsükkel, mis vastutab ridade loomise eest
 for (( i=1; i<=rows; i++ ))
 do
-    # Prindib rea numbri ja vahe
-    echo -n "$i. "
+    # Tingimus ridade numbri formaadi reguleerimiseks
+    if [[ $i -lt 10 ]]; then
+        # Prindib ühekohalised numbrid lisatühikuga
+        echo -n "$i.  "
+    else
+        # Prindib kahekohalised numbrid ilma lisatühikuta
+        echo -n "$i. "
+    fi
 
-    # Sisemine tsükkel ringide jaoks. Prindib ringe, mis väheneb iga reaga.
+    # Sisemine tsükkel ringide jaoks.
     for (( j=1; j<=rows-i; j++ ))
     do
         echo -n "o "
     done
 
-    # Sisemine tsükkel tärnide jaoks. Prindib tärne, mis suureneb iga reaga.
+    # Sisemine tsükkel tärnide jaoks.
     for (( k=1; k<=i; k++ ))
     do
         echo -n "* "
     done
 
-    # Prindib uue rea, et alustada järgmise reaga
+    # Prindib uue rea
     echo ""
 done
