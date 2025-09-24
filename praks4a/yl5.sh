@@ -1,69 +1,56 @@
 #!/bin/bash
+#Skript kasutaja määratud kataloogi varundamiseks koos kuupäeva ja dublikaatide haldusega.
 
-# Küsi kasutajalt varundatava kataloogi täielik tee
-read -p "Sisesta kataloogi täielik tee, mida soovid varundada: " TARGET_DIR
+# Define the backup directory.
+BACKUP_DIR="./backup"
 
-# Kontrolli, kas kataloogi tee sisestati
-if [ -z "$TARGET_DIR" ]; then
-    echo "Viga: Kataloogi teed ei sisestatud."
+# Ensure the backup directory exists.
+mkdir -p "$BACKUP_DIR"
+
+# Get the full path of the backup directory for output message.
+FULL_BACKUP_PATH=$(readlink -f "$BACKUP_DIR")
+
+# Ask the user for the directory to back up.
+read -p "Sisesta kataloogi täielik tee, mida soovid varundada: " SOURCE_DIR
+
+# 1. Check if the directory exists.
+if [ ! -d "$SOURCE_DIR" ]; then
+    echo "Viga: Kataloog '$SOURCE_DIR' ei eksisteeri."
     exit 1
 fi
 
-# Kontrolli, kas kataloog eksisteerib
-if [ ! -d "$TARGET_DIR" ]; then
-    echo "Viga: Kataloogi '$TARGET_DIR' ei leitud."
+# 2. Prevent backing up root-level directories.
+if [ "$(dirname "$SOURCE_DIR")" == "/" ] || [ "$SOURCE_DIR" == "/" ]; then
+    echo "Viga: Ligipääs 'root' kaustadele keelatud! Varundamiseks peab olema root kasutaja."
     exit 1
 fi
 
-# Eralda kataloogi nimi
-DIR_NAME=$(basename "$TARGET_DIR")
+# Get the name of the directory to use in the backup file name.
+DIR_NAME=$(basename "$SOURCE_DIR")
 
-# Saa jooksev kuupäev formaadis DDmonYYYY (nt 22sept2025)
-DATE_FORMAT=$(date +"%d%b%Y")
+# Get the current date in the specified format (e.g., "18sept2025").
+CURRENT_DATE=$(date +"%d%b%Y" | tr '[:upper:]' '[:lower:]')
 
-# Määra varunduse sihtkataloog
-DEST_DIR="/home/karol/skriptimine/backups" # Muuda vajadusel
+# Construct the base file name with the date.
+BASE_FILE_NAME="$DIR_NAME.backup.$CURRENT_DATE.tar.gz"
 
-# Loo sihtkataloog, kui see ei eksisteeri
-if [ ! -d "$DEST_DIR" ]; then
-    echo "Kataloog '$DEST_DIR' ei eksisteeri. Loome selle."
-    mkdir -p "$DEST_DIR"
-fi
+# 3. Handle duplicate file names by adding a number.
+BACKUP_FILE="$BASE_FILE_NAME"
+COUNTER=1
 
-# Põhifailinimi ilma numbrilisandita
-BASE_FILENAME="${DIR_NAME}.backup.${DATE_FORMAT}"
+while [ -f "$BACKUP_DIR/$BACKUP_FILE" ]; do
+    BACKUP_FILE="$DIR_NAME.backup.$CURRENT_DATE($COUNTER).tar.gz"
+    COUNTER=$((COUNTER + 1))
+done
 
-# Algne failinimi
-BACKUP_FILENAME="${BASE_FILENAME}.tar.gz"
+# Get the full path of the source directory for the output message.
+FULL_SOURCE_PATH=$(readlink -f "$SOURCE_DIR")
 
-# Kontrolli, kas varundus juba eksisteerib ja leia järgmine vaba number
-if [ -f "${DEST_DIR}/${BACKUP_FILENAME}" ]; then
-    LATEST_NUMBER=0
-    for file in "${DEST_DIR}/${BASE_FILENAME}"*.tar.gz; do
-        if [[ "$file" =~ \(([0-9]+)\)\.tar\.gz$ ]]; then
-            CURRENT_NUMBER=${BASH_REMATCH[1]}
-            if (( CURRENT_NUMBER > LATEST_NUMBER )); then
-                LATEST_NUMBER=$CURRENT_NUMBER
-            fi
-        fi
-    done
-    
-    NEXT_NUMBER=$((LATEST_NUMBER + 1))
-    
-    BACKUP_FILENAME="${BASE_FILENAME}(${NEXT_NUMBER}).tar.gz"
-fi
+# Print the required descriptive message.
+echo "Kataloogi '$FULL_SOURCE_PATH' varundus tehakse."
+echo "Varundusfail salvestatakse kataloogi '$FULL_BACKUP_PATH' nimega '$BACKUP_FILE'."
 
-# Väljasta seletav kirjeldus
-echo "Varundame kataloogi '$TARGET_DIR'."
-echo "Varundus salvestatakse nimega '$BACKUP_FILENAME' asukohta '$DEST_DIR'."
+# Create the compressed tar archive.
+tar -czf "$BACKUP_DIR/$BACKUP_FILE" -C "$(dirname "$SOURCE_DIR")" "$DIR_NAME"
 
-# Loo tihendatud varundusfail
-tar -czvf "${DEST_DIR}/${BACKUP_FILENAME}" -C "$(dirname "$TARGET_DIR")" "$DIR_NAME"
-
-# Kontrolli, kas varundamine õnnestus
-if [ $? -eq 0 ]; then
-    echo "Varundus valmis!"
-else
-    echo "Varunduse loomine ebaõnnestus."
-    exit 1
-fi
+echo "Varundamine on edukalt lõpetatud."
